@@ -1,0 +1,44 @@
+extends CharacterBody2D
+
+
+const SPEED = 130
+
+@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+var direction := Vector2.ZERO
+
+func _physics_process(delta: float) -> void:
+	direction = Vector2.ZERO
+	
+	# 方向输入
+	if Input.is_action_pressed("move_up"):
+		direction.y -= 1
+	if Input.is_action_pressed("move_down"):
+		direction.y += 1
+	if Input.is_action_pressed("move_left"):
+		direction.x -= 1
+	if Input.is_action_pressed("move_right"):
+		direction.x += 1
+
+	# 归一化方向
+	if direction != Vector2.ZERO:
+		direction = direction.normalized()
+		velocity = direction * SPEED
+		move_and_slide()
+		update_animation(direction)
+	else:
+		velocity = Vector2.ZERO
+		animated_sprite.stop()	
+	
+func update_animation(dir: Vector2) -> void:
+	# 判断主方向（只使用 4 向动画）
+	if abs(dir.x) > abs(dir.y):
+		if dir.x > 0:
+			animated_sprite.play("right")
+		else:
+			animated_sprite.play("left")
+	else:
+		if dir.y > 0:
+			animated_sprite.play("down")
+		else:
+			animated_sprite.play("up")
